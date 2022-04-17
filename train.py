@@ -40,8 +40,74 @@ def clean_sqli_data(data):
         data[i]=data[i].replace('&', ' & ')
         data[i]=data[i].replace('&&', ' & & ')
         data[i]=data[i].replace(';', ' ; ')
+        data[i]=data[i].replace('../', ' . . / ')
+        data[i]=data[i].replace('\\..', ' \\ . . ')
+        data[i]=data[i].replace(':/', ' : / ')
+        data[i]=data[i].replace('/', ' / ')
+        data[i]=data[i].replace('://', ' : / / ')
+        data[i]=data[i].replace(':\\', ' : \\ ')
+        data[i]=data[i].replace('\\', ' \\ ')
+        data[i]=data[i].replace('\\\\&', ' \\ \\ & ')
+        data[i]=data[i].replace('{{', ' { { ')
+        data[i]=data[i].replace('{{[', ' { { [ ')
+        data[i]=data[i].replace('[', ' [ ')
+        data[i]=data[i].replace(']', ' ] ')
+        data[i]=data[i].replace('{', ' { ')
+        data[i]=data[i].replace('{%', ' { % ')
+        data[i]=data[i].replace('{$', ' { $ ')
+        data[i]=data[i].replace('}', ' } ')
     
     return data
+
+#crlf_dataset
+path='dataset/crlf.txt'
+
+crlf_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    crlf_dataset.append(x)
+
+crlf_dataset=clean_sqli_data(crlf_dataset)
+
+#log4j_dataset
+path='dataset/log4j.txt'
+
+log4j_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    log4j_dataset.append(x)
+
+log4j_dataset=clean_sqli_data(log4j_dataset)
+
+#path_transversal
+path='dataset/path_transversal.txt'
+
+path_transversal_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    path_transversal_dataset.append(x)
+
+path_transversal_dataset=clean_sqli_data(path_transversal_dataset)
+
+#ssrf
+path='dataset/ssrf.txt'
+
+ssrf_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    ssrf_dataset.append(x)
+
+ssrf_dataset=clean_sqli_data(ssrf_dataset)
+
+#ssti
+path='dataset/ssti.txt'
+
+ssti_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    ssti_dataset.append(x)
+
+ssti_dataset=clean_sqli_data(ssti_dataset)
 
 #xss
 path='dataset/xss.txt'
@@ -194,7 +260,7 @@ for i in range(len(data)):
 
 path='dataset/benign_for_training.txt'
 benign_data=[]
-f = open(path, "r")
+f = open(path, "r", encoding="utf8")
 for x in f:
     benign_data.append(x)
 
@@ -219,7 +285,7 @@ for i in benign_data:
 
 # print(f"SQL fuzzing : {len(sql_lines_fuzzing)}  camoufl4gs : {len(sql_lines_camoufl4g3)} parsed : {len(sql_lines_bypasses)} owasp : {len(sql_lines_owasp)} generic : {len(sql_lines_Generic)}")
 
-all_sqli_sentence=sql_lines_owasp+sql_lines_bypasses+sql_lines_camoufl4g3+sql_lines_fuzzing+sql_lines_Generic+xss_dataset+os_command_injection
+all_sqli_sentence=sql_lines_owasp+sql_lines_bypasses+sql_lines_camoufl4g3+sql_lines_fuzzing+sql_lines_Generic+xss_dataset+os_command_injection+crlf_dataset+log4j_dataset+path_transversal_dataset+ssrf_dataset+ssti_dataset
 
 # replace numeric values by a keyword 'numeric'
 def optional_numeric_to_numeric(all_sqli_sentence):
@@ -255,7 +321,7 @@ def optional_numeric_to_numeric(all_sqli_sentence):
     
     return all_sqli_sentence
 
-print(len(all_sqli_sentence))
+print("data serangan : " + str(len(all_sqli_sentence)))
 
 
 import pandas as pd
@@ -300,7 +366,7 @@ posts = vectorizer.fit_transform(df['Sentence'].values.astype('U')).toarray()
 
 print(posts.shape)
 
-posts.shape=(9479,64,64,1)
+posts.shape=(18988,64,64,1)
 
 print(posts.shape)
 
@@ -381,7 +447,7 @@ model.compile(loss='binary_crossentropy',
 # print(model.summary())
 
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=15,
+                    epochs=20,
                     verbose=True,
                     validation_data=(X_test, y_test),
                     batch_size=128)

