@@ -99,3 +99,7 @@ http://100.100.100.200/latest/meta-data/image-id
 http://127.0.0.1:2379/version
 http://127.0.0.1:2379/v2/keys/
 http://127.0.0.1:2375/v1.24/containers/json
+WEB-INF/web.xml
+WEB-INF\web.xml
+/WEB-INF/web.xml
+\WEB-INF\web.xml

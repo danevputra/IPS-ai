@@ -43,6 +43,7 @@ def clean_sqli_data(data):
         data[i]=data[i].replace('../', ' . . / ')
         data[i]=data[i].replace('\\..', ' \\ . . ')
         data[i]=data[i].replace(':/', ' : / ')
+        data[i]=data[i].replace(':\\', ' : \\ ')
         data[i]=data[i].replace('/', ' / ')
         data[i]=data[i].replace('://', ' : / / ')
         data[i]=data[i].replace(':\\', ' : \\ ')
@@ -56,6 +57,7 @@ def clean_sqli_data(data):
         data[i]=data[i].replace('{%', ' { % ')
         data[i]=data[i].replace('{$', ' { $ ')
         data[i]=data[i].replace('}', ' } ')
+        # data[i]=data[i].replace('.', ' . ')
     
     return data
 
@@ -322,6 +324,7 @@ def optional_numeric_to_numeric(all_sqli_sentence):
     return all_sqli_sentence
 
 print("data serangan : " + str(len(all_sqli_sentence)))
+print("data benign : "+str(len(data)))
 
 
 import pandas as pd
@@ -337,9 +340,9 @@ for i in all_sqli_sentence:
 for i in data:
     values.append((i,0))
 
-# print(len(all_sqli_sentence)+len(data))
+print(len(all_sqli_sentence)+len(data))
 
-# print(len(values))
+print(len(values))
 
 for i in benign_sentence:
     values.append((i,0))
@@ -347,8 +350,11 @@ for i in benign_sentence:
 for i in sqli_data:
     values.append((i,1))
 
-# print(len(values))
-# print(values[1])
+print(len(values))
+print(values[1])
+
+print("Serangan : "+ str(len(all_sqli_sentence)+len(sqli_data)))
+print("Benign : "+ str(len(data)+len(benign_sentence)))
 
 # convert to dataframe
 
@@ -366,7 +372,7 @@ posts = vectorizer.fit_transform(df['Sentence'].values.astype('U')).toarray()
 
 print(posts.shape)
 
-posts.shape=(18988,64,64,1)
+posts.shape=(23040,64,64,1)
 
 print(posts.shape)
 
@@ -447,7 +453,7 @@ model.compile(loss='binary_crossentropy',
 # print(model.summary())
 
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=20,
+                    epochs=50,
                     verbose=True,
                     validation_data=(X_test, y_test),
                     batch_size=128)
@@ -465,7 +471,9 @@ from sklearn.metrics import accuracy_score
 print(accuracy_score(y_test,pred))
 
 for i,j in zip(y_test,pred):
-    print(i==j)
+    # print(i==j)
+    if i==j :
+        temp = 0
 
 from keras.models import load_model
 import pickle
@@ -519,21 +527,19 @@ def confusion_matrix(truth,predicted):
     precision=precision_function(true_positive, false_positive)
     recall=recall_function(true_positive, false_negative)
     
-    return (accuracy,
-            precision,
-           recall)
+    return (accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative)
 
-accuracy,precision,recall=confusion_matrix(y_test,pred)
-print(" For CNN \n Accuracy : {0} \n Precision : {1} \n Recall : {2}".format(accuracy, precision, recall))
+accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred)
+print(" For CNN \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall=confusion_matrix(y_test,pred_gnb)
-print(" For Naive Bayes \n Accuracy : {0} \n Precision : {1} \n Recall : {2}".format(accuracy, precision, recall))
+accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_gnb)
+print(" For Naive Bayes \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall=confusion_matrix(y_test,pred_svm)
-print(" For SVM \n Accuracy : {0} \n Precision : {1} \n Recall : {2}".format(accuracy, precision, recall))
+accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_svm)
+print(" For SVM Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall=confusion_matrix(y_test,pred_knn)
-print(" For KNN \n Accuracy : {0} \n Precision : {1} \n Recall : {2}".format(accuracy, precision, recall))
+accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_knn)
+print(" For KNN Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall=confusion_matrix(y_test,pred_dt)
-print(" For Decision Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2}".format(accuracy, precision, recall))
+accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_dt)
+print(" For Decision Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
