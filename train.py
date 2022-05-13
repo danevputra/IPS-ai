@@ -374,8 +374,6 @@ print(posts.shape)
 
 posts.shape=(23040,64,64,1)
 
-print(posts.shape)
-
 X=posts
 y=df['Label']
 
@@ -391,33 +389,33 @@ testX=X_test.copy()
 testX.shape=(testX.shape[0],testX.shape[1]*testX.shape[2])
 
 
-### NAIVE BAYES
-from sklearn.naive_bayes import GaussianNB
-gnb = GaussianNB()
-gnb.fit(trainX, y_train)
-pred_gnb = gnb.predict(testX)
+# ### NAIVE BAYES
+# from sklearn.naive_bayes import GaussianNB
+# gnb = GaussianNB()
+# gnb.fit(trainX, y_train)
+# pred_gnb = gnb.predict(testX)
 
-### SVM
-from sklearn.svm import SVC
-clf = SVC(gamma='auto')
-clf.fit(trainX, y_train)
-pred_svm=clf.predict(testX)
+# ### SVM
+# from sklearn.svm import SVC
+# clf = SVC(gamma='auto')
+# clf.fit(trainX, y_train)
+# pred_svm=clf.predict(testX)
 
-### NEAREST NEIGHBOR
-from sklearn.neighbors import KNeighborsClassifier
+# ### NEAREST NEIGHBOR
+# from sklearn.neighbors import KNeighborsClassifier
 
-neigh = KNeighborsClassifier(n_neighbors=3)
-neigh.fit(trainX, y_train)
+# neigh = KNeighborsClassifier(n_neighbors=3)
+# neigh.fit(trainX, y_train)
 
-pred_knn = neigh.predict(testX)
+# pred_knn = neigh.predict(testX)
 
-### DECISION TREE
-from sklearn import tree
+# ### DECISION TREE
+# from sklearn import tree
 
-dt = tree.DecisionTreeClassifier()
-dt = dt.fit(trainX, y_train)
+# dt = tree.DecisionTreeClassifier()
+# dt = dt.fit(trainX, y_train)
 
-pred_dt = dt.predict(testX)
+# pred_dt = dt.predict(testX)
 
 # print(X_train.shape)
 
@@ -450,13 +448,19 @@ model=tf.keras.models.Sequential([
 model.compile(loss='binary_crossentropy', 
               optimizer='adam', 
               metrics=['accuracy'])
-# print(model.summary())
+print(model.summary())
 
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=50,
+                    epochs=60,
                     verbose=True,
                     validation_data=(X_test, y_test),
                     batch_size=128)
+
+import matplotlib.pyplot as plt
+plt.xlabel("Epochs Number")
+plt.ylabel("Loss Magnitude")
+plt.plot(classifier_nn.history['loss'])
+plt.show()
 
 pred=model.predict(X_test)
 
@@ -532,14 +536,14 @@ def confusion_matrix(truth,predicted):
 accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred)
 print(" For CNN \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_gnb)
-print(" For Naive Bayes \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
+# accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_gnb)
+# print(" For Naive Bayes \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_svm)
-print(" For SVM Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
+# accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_svm)
+# print(" For SVM Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_knn)
-print(" For KNN Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
+# accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_knn)
+# print(" For KNN Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
 
-accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_dt)
-print(" For Decision Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
+# accuracy,precision,recall, true_positive, true_negative, false_positive, false_negative=confusion_matrix(y_test,pred_dt)
+# print(" For Decision Tree \n Accuracy : {0} \n Precision : {1} \n Recall : {2} \n true_positive : {3} \n true_negative : {4} \n false_positive : {5} \n false_negative : {6}".format(accuracy, precision, recall, true_positive, true_negative, false_positive, false_negative))
