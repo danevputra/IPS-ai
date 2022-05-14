@@ -372,7 +372,7 @@ posts = vectorizer.fit_transform(df['Sentence'].values.astype('U')).toarray()
 
 print(posts.shape)
 
-posts.shape=(23040,64,64,1)
+posts.shape=(23053,64,64,1)
 
 X=posts
 y=df['Label']
@@ -429,15 +429,15 @@ model=tf.keras.models.Sequential([
     
     tf.keras.layers.Conv2D(64, (3,3), activation=tf.nn.relu, input_shape=(64,64,1)),
     tf.keras.layers.MaxPooling2D(2,2),
-    tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.BatchNormalization(),
     
     tf.keras.layers.Conv2D(128,(3,3), activation=tf.nn.relu),
     tf.keras.layers.MaxPooling2D(2,2),
-    tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.BatchNormalization(),
     
     tf.keras.layers.Conv2D(256,(3,3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2,2),
-    tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.BatchNormalization(),
     
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(256, activation='relu'),
@@ -452,15 +452,26 @@ model.compile(loss='binary_crossentropy',
 print(model.summary())
 
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=60,
+                    epochs=50,
                     verbose=True,
                     validation_data=(X_test, y_test),
                     batch_size=128)
 
 import matplotlib.pyplot as plt
-plt.xlabel("Epochs Number")
-plt.ylabel("Loss Magnitude")
 plt.plot(classifier_nn.history['loss'])
+plt.plot(classifier_nn.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
+
+plt.plot(classifier_nn.history['accuracy'])
+plt.plot(classifier_nn.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
 plt.show()
 
 pred=model.predict(X_test)
