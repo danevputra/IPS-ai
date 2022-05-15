@@ -452,7 +452,7 @@ model.compile(loss='binary_crossentropy',
 print(model.summary())
 
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=50,
+                    epochs=21,
                     verbose=True,
                     validation_data=(X_test, y_test),
                     batch_size=128)

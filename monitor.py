@@ -69,14 +69,16 @@ def main():
                     # print("data : "+data)
                     #syn flood
                     if target == load_balancer and flag_syn == 1 and flag_ack == 0 and (len(data)!=0):
-                        print_alert(time, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Syn Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
-                        append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Syn Flood DOS")
+                        time_syn = str(datetime.datetime.now())
+                        print_alert(time, time_syn, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Syn Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
+                        append_log(time, time_syn, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Syn Flood DOS")
                     
                     #ack flood
                     #udah bisa kl loic, golden eye belom
                     elif target == load_balancer and flag_syn == 0 and flag_ack == 1 and flag_psh == 0 and (len(data)!=0):
-                        print_alert(time, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Ack Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
-                        append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Ack Flood DOS")
+                        time_ack = str(datetime.datetime.now())
+                        print_alert(time, time_ack, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Ack Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
+                        append_log(time, time_ack, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Ack Flood DOS")
                     
                     else :
                         if (dest_port in listen_port) :
@@ -85,18 +87,24 @@ def main():
                                 temp = 0
                             
                             elif ("\r\n" not in data) :
-                                parsing_data = data
-                                parsing_data = cut_string(parsing_data)
-                                # print("bisa kok" + parsing_data)
+                                raw_data = data
 
-                                status_oneline = predict_sqli_attack(parsing_data)
-                                #print(str(status_oneline))
+                                arr1 = cut_input(raw_data)
 
-                                if float(status_oneline) > 0.5:
-                                    print_alert(time, dest_mac,src_mac,eth_proto,status_oneline,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
-                                    append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(status_oneline))
-                                else :
-                                    append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(status_oneline))
+                                for i in range(len(arr1)):
+                                    parsing_data = cut_string(arr1[i])
+                                    parsing_data = parsing_data.split("=", 1)[1]
+                                    # print("bisa kok" + parsing_data)
+
+                                    status_oneline = predict_sqli_attack(parsing_data)
+                                    #print(str(status_oneline))
+                                    time2_1 = str(datetime.datetime.now())
+
+                                    if float(status_oneline) > 0.5:
+                                        print_alert(time, time2_1, dest_mac,src_mac,eth_proto,status_oneline,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
+                                        append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(status_oneline))
+                                    else :
+                                        append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(status_oneline))
 
                             else:
                                 # print(str(data))
@@ -107,37 +115,46 @@ def main():
                                 if substring3 not in parse_data2:
                                     parse_data2 = parse_data2[:parse_data2.index("\r")]
                                     # parse_data2 = parse_data2.replace("b\'","")
-                                    parse_data2 = re.sub(r"b\'","",parse_data2)                       
+                                    parse_data2 = re.sub(r"b\'","",parse_data2)    
                                     # print("parse_data2 : "+ parse_data2)
 
                                     if parse_data2[:3] == "GET" and parse_data2[5]!= " " and start in parse_data2:
                                         parse_data2 = parse_data2[parse_data2.index(start)+len(start):parse_data2.index(end)]
-                                        parse_data2 = cut_string(parse_data2)
+                                        arr2 = cut_input(parse_data2)
 
-                                        if (len(parse_data2)!=0):
-                                            status2 = predict_sqli_attack(parse_data2)
-                                            #print(str(status))
+                                        for j in range(len(arr2)):
+                                            parse_data2 = cut_string(arr2[j])
+                                            if (len(parse_data2)!=0):
+                                                parse_data2 = parse_data2.split("=", 1)[1]
+                                                status2 = predict_sqli_attack(parse_data2)
+                                                #print(str(status))
+                                                time2_2 = str(datetime.datetime.now())
 
-                                            if float(status2) > 0.5:
-                                                print_alert(time, dest_mac,src_mac,eth_proto,status2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
-                                                append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(status2))
-                                            else :
-                                                append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(status2))
+                                                if float(status2) > 0.5:
+                                                    print_alert(time, time2_2, dest_mac,src_mac,eth_proto,status2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
+                                                    append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(status2))
+                                                else :
+                                                    append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(status2))
 
                                 #footer
                                 parse_data = data.rpartition('\n')[2]
-                                parse_data = cut_string(parse_data)
-                                # print("parse_data : "+ parse_data)
+                                arr3 = cut_input(parse_data)
 
-                                if (len(parse_data)!=0):
-                                    status = predict_sqli_attack(parse_data)
-                                    #print(str(status))
+                                for k in range(len(arr3)):
+                                    parse_data = cut_string(arr3[k])
+                                    # print("parse_data : "+ parse_data)
 
-                                    if float(status) > 0.5:
-                                        print_alert(time, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
-                                        append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",float(status))
-                                    else :
-                                        append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",float(status))
+                                    if (len(parse_data)!=0):
+                                        parse_data = parse_data.split("=", 1)[1]
+                                        status = predict_sqli_attack(parse_data)
+                                        #print(str(status))
+                                        time2_3 = str(datetime.datetime.now())
+
+                                        if float(status) > 0.5:
+                                            print_alert(time, time2_3, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
+                                            append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",float(status))
+                                        else :
+                                            append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",float(status))
                                 
                                 #other header
                                 parse_data3 = data
@@ -153,28 +170,29 @@ def main():
                                     if (len(check_data)!=0):
                                         status3 = predict_sqli_attack(check_data)
                                         #print(str(status))
+                                        time2_4 = str(datetime.datetime.now())
 
                                         if float(status3) > 0.5:
-                                            print_alert(time, dest_mac,src_mac,eth_proto,status3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
-                                            append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(status3))
+                                            print_alert(time, time2_4, dest_mac,src_mac,eth_proto,status3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
+                                            append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(status3))
                                         else :
-                                            append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(status3))
+                                            append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(status3))
 
 def create_csv():
     global filename
     filename = "log/log_"+str(datetime.datetime.now())+".csv"
     with open(filename, 'w') as f:
         spamwriter = csv.writer(f, doublequote=True, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        header = ['Time', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgement', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'unique data', 'status' , 'confidence']
+        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgement', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'unique data', 'status' , 'confidence']
         spamwriter.writerow(header)
     f.close()
 
 
-def append_log(time, src_mac, dest_mac, eth_proto, version, header_length, ttl, protocol, src_ip, dest_ip, src_port, dest_port, sequence, acknowledgement, urg, ack, psh, rst, syn, fin, data, parse_data, status , confidence):
+def append_log(time, time2, src_mac, dest_mac, eth_proto, version, header_length, ttl, protocol, src_ip, dest_ip, src_port, dest_port, sequence, acknowledgement, urg, ack, psh, rst, syn, fin, data, parse_data, status , confidence):
     # print(filename)
     with open(filename,'a') as fd:
         write_outfile = csv.writer(fd)
-        write_outfile.writerow([str(time), str(src_mac), str(dest_mac), str(eth_proto), str(version), str(header_length), str(ttl), str(protocol), str(src_ip), str(dest_ip), str(src_port), str(dest_port), str(sequence), str(acknowledgement), str(urg), str(ack), str(psh), str(rst), str(syn), str(fin), str(data), str(parse_data), str(status) , str(confidence)])
+        write_outfile.writerow([str(time), str(time2), str(src_mac), str(dest_mac), str(eth_proto), str(version), str(header_length), str(ttl), str(protocol), str(src_ip), str(dest_ip), str(src_port), str(dest_port), str(sequence), str(acknowledgement), str(urg), str(ack), str(psh), str(rst), str(syn), str(fin), str(data), str(parse_data), str(status) , str(confidence)])
     fd.close()
 
 
@@ -188,14 +206,24 @@ def search_vuln_header(data):
     return avail_header
 
 def cut_string(parser) :
-    parser = re.sub(r'=',' ',parser)
-    parser = re.sub(r'\+',' ',parser)
-    parser = re.sub(r'&',' ',parser)
+    # parser = re.sub(r'=',' ',parser)
+    # parser = re.sub(r'\+',' ',parser)
+    # parser = re.sub(r'&',' ',parser)
     parser = unquote(parser)
     return parser
 
+def cut_input(string):
+    arr = []
+    while "&" in string:
+        temp = string.split("&", 1)[0]
+        if string.split("&", 1)[1] :
+            string = string.split("&", 1)[1]
+        arr.append(temp)
+    arr.append(string)
+    return arr
+
 #print alert
-def print_alert(time, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data):
+def print_alert(time, time2, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data):
     print('=======================================')
     print('ALERT ATTACK HAS OCURRED')
     print('=======================================')
@@ -203,7 +231,7 @@ def print_alert(time, dest_mac,src_mac,eth_proto,status,version,header_length,tt
     print('=======================================')
     print('Date Time : ' + time)
     print('=======================================')
-    print('Detection Finished at : ' + str(datetime.datetime.now()))
+    print('Detection Finished at : ' + time2)
     print('=======================================')
     print('\nEthernet Frame:')
     print(TAB_1 + 'Destination : {}, Source : {}, Protocol : {}'.format(dest_mac,src_mac,eth_proto))
