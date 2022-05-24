@@ -18,6 +18,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import keras
 import os
+import math
 
 # preprocess sql data to have same format for all files
 
@@ -120,6 +121,16 @@ for x in f:
     xss_dataset.append(x)
 
 xss_dataset=clean_sqli_data(xss_dataset)
+
+#big_dataset
+path='dataset/new_dataset_conv.txt'
+
+big_dataset=[]
+f = open(path, "r", encoding='utf8')
+for x in f:
+    big_dataset.append(x)
+
+big_dataset=clean_sqli_data(big_dataset)
 
 #os command injection
 path='dataset/os_command_injection.txt'
@@ -287,7 +298,7 @@ for i in benign_data:
 
 # print(f"SQL fuzzing : {len(sql_lines_fuzzing)}  camoufl4gs : {len(sql_lines_camoufl4g3)} parsed : {len(sql_lines_bypasses)} owasp : {len(sql_lines_owasp)} generic : {len(sql_lines_Generic)}")
 
-all_sqli_sentence=sql_lines_owasp+sql_lines_bypasses+sql_lines_camoufl4g3+sql_lines_fuzzing+sql_lines_Generic+xss_dataset+os_command_injection+crlf_dataset+log4j_dataset+path_transversal_dataset+ssrf_dataset+ssti_dataset
+all_sqli_sentence=sql_lines_owasp+sql_lines_bypasses+sql_lines_camoufl4g3+sql_lines_fuzzing+sql_lines_Generic+xss_dataset+os_command_injection+crlf_dataset+log4j_dataset+path_transversal_dataset+ssrf_dataset+ssti_dataset+big_dataset
 
 # replace numeric values by a keyword 'numeric'
 def optional_numeric_to_numeric(all_sqli_sentence):
@@ -345,10 +356,12 @@ print(len(all_sqli_sentence)+len(data))
 print(len(values))
 
 for i in benign_sentence:
-    values.append((i,0))
+    if benign_sentence!="" :
+        values.append((i,0))
 
 for i in sqli_data:
-    values.append((i,1))
+    if sqli_data!="":
+        values.append((i,1))
 
 print(len(values))
 print(values[1])
@@ -361,6 +374,7 @@ print("Benign : "+ str(len(data)+len(benign_sentence)))
 df=pd.DataFrame(values,columns=['Sentence','Label'])
 # print(df.head())
 
+df.drop_duplicates(subset=['Sentence'])
 df.to_csv('sqli.csv', index=False, encoding='utf-16')
 df=pd.read_csv('sqli.csv',encoding='utf-16')
 
@@ -372,7 +386,9 @@ posts = vectorizer.fit_transform(df['Sentence'].values.astype('U')).toarray()
 
 print(posts.shape)
 
-posts.shape=(23053,64,64,1)
+# print(posts)
+
+posts.shape=(35640,64,64,1)
 
 X=posts
 y=df['Label']
@@ -421,28 +437,45 @@ testX.shape=(testX.shape[0],testX.shape[1]*testX.shape[2])
 
 import tensorflow as tf
 from keras.models import Sequential
-from keras import layers
+from keras import layers, callbacks
 from keras.preprocessing.text import Tokenizer
 from keras.wrappers.scikit_learn import KerasClassifier
 
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode='auto', baseline=None, restore_best_weights=True)
+
 model=tf.keras.models.Sequential([
     
-    tf.keras.layers.Conv2D(64, (3,3), activation=tf.nn.relu, input_shape=(64,64,1)),
+    tf.keras.layers.Conv2D(5, (8,8), activation=tf.nn.relu, input_shape=(64,64,1)),
     tf.keras.layers.MaxPooling2D(2,2),
+    # tf.keras.layers.Dropout(0.5),
+    # tf.keras.layers.BatchNormalization(),
+
+    # tf.keras.layers.Conv2D(50,(3,3), activation=tf.nn.relu),
+    # tf.keras.layers.MaxPooling2D(2,2),
+    
+    # tf.keras.layers.Conv2D(128,(3,3), activation=tf.nn.relu),
+    # tf.keras.layers.MaxPooling2D(2,2),
+    # tf.keras.layers.Dropout(0.5),
+    # tf.keras.layers.BatchNormalization(),
+
+    # tf.keras.layers.Conv2D(128,(3,3), activation=tf.nn.relu),
+    # tf.keras.layers.MaxPooling2D(2,2),
+    
+    # tf.keras.layers.Conv2D(256,(3,3), activation=tf.nn.relu),
+    # tf.keras.layers.MaxPooling2D(2,2),
     # tf.keras.layers.BatchNormalization(),
     
-    tf.keras.layers.Conv2D(128,(3,3), activation=tf.nn.relu),
-    tf.keras.layers.MaxPooling2D(2,2),
-    # tf.keras.layers.BatchNormalization(),
-    
-    tf.keras.layers.Conv2D(256,(3,3), activation='relu'),
-    tf.keras.layers.MaxPooling2D(2,2),
-    # tf.keras.layers.BatchNormalization(),
-    
+    tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dense(128,activation='relu'),
-    tf.keras.layers.Dense(64, activation=tf.nn.relu),
+    # tf.keras.layers.Dense(512, activation=tf.nn.relu),
+    # tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    # tf.keras.layers.Dense(128,activation=tf.nn.relu),
+    # tf.keras.layers.Dense(64, activation=tf.nn.relu),
+    # tf.keras.layers.Dense(50, activation=tf.nn.relu),
+    # tf.keras.layers.Dense(16, activation=tf.nn.relu),
+    tf.keras.layers.Dense(5, activation=tf.nn.relu),
+    # tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(2, activation=tf.nn.relu),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -451,11 +484,39 @@ model.compile(loss='binary_crossentropy',
               metrics=['accuracy'])
 print(model.summary())
 
+BATCH_SIZE = 32
+num_x_train = len(X_train)
+print("num train" + str(num_x_train))
+
 classifier_nn = model.fit(X_train,y_train,
-                    epochs=21,
+                    epochs=500,
                     verbose=True,
                     validation_data=(X_test, y_test),
-                    batch_size=128)
+                    steps_per_epoch=math.ceil(num_x_train/BATCH_SIZE),
+                    callbacks=[callback]
+                    )
+
+# classifier_nn = model.fit(X_train,y_train,
+#                     epochs=30,
+#                     verbose=True,
+#                     validation_data=(X_test, y_test),
+#                     steps_per_epoch=math.ceil(num_x_train/BATCH_SIZE)
+#                     )
+
+# classifier_nn = model.fit(X_train,y_train,
+#                     epochs=500,
+#                     verbose=True,
+#                     validation_data=(X_test, y_test),
+#                     batch_size=128,
+#                     callbacks=[callback]
+#                     )
+
+# classifier_nn = model.fit(X_train,y_train,
+#                     epochs=21,
+#                     verbose=True,
+#                     validation_data=(X_test, y_test),
+#                     batch_size=128
+#                     )
 
 import matplotlib.pyplot as plt
 plt.plot(classifier_nn.history['loss'])
