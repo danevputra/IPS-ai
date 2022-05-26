@@ -183,7 +183,7 @@ def create_csv():
     filename = "log/log_"+str(datetime.datetime.now())+".csv"
     with open(filename, 'w') as f:
         spamwriter = csv.writer(f, doublequote=True, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgement', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'unique data', 'status' , 'confidence']
+        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgment', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'unique data', 'status' , 'Detection Score']
         spamwriter.writerow(header)
     f.close()
 
@@ -207,7 +207,7 @@ def search_vuln_header(data):
 
 def cut_string(parser) :
     # parser = re.sub(r'=',' ',parser)
-    # parser = re.sub(r'\+',' ',parser)
+    parser = re.sub(r'\+',' ',parser)
     # parser = re.sub(r'&',' ',parser)
     parser = unquote(parser)
     return parser
@@ -240,7 +240,7 @@ def print_alert(time, time2, dest_mac,src_mac,eth_proto,status,version,header_le
     print(TAB_1 + 'Protocol : {}, Source : {}, Target : {}'.format(proto, src, target))
     print('TCP Packet:')
     print(TAB_1 + 'Source Port : {}, Destination Port : {}'.format(src_port, dest_port))
-    print(TAB_1 + 'Sequence : {}, Acknowledgement : {}'.format(sequence, acknowledgement))
+    print(TAB_1 + 'Sequence : {}, Acknowledgment : {}'.format(sequence, acknowledgement))
     print(TAB_1 + 'Flags : ')
     print(TAB_2 + 'URG : {}, ACK : {}, PSH : {}, RST : {}, SYN : {}, FIN : {}'.format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
     print(TAB_1 + 'Dangerous Payload : ')
@@ -346,6 +346,8 @@ def clean_data(input_val):
 def predict_sqli_attack(data):
 
     input_val=data
+    if input_val=="submit" or input_val=="Submit" :
+        return 0
     input_val=clean_data(input_val)
     input_val=[input_val]
     input_val=myvectorizer.transform(input_val).toarray()
