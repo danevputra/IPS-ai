@@ -47,8 +47,8 @@ def main():
     listen_port = config.listen_port
     global iterate
     iterate = 0
-    global minute
-    minute = datetime.datetime.now().minute
+    # global minute
+    # minute = datetime.datetime.now().minute
     # print(listen_port)
     
     print("ready")
@@ -59,20 +59,21 @@ def main():
         f = open("temp.db", "r")
         lines = f.readlines()
         # print(len(lines))
-        sekarang = datetime.datetime.now().minute
-        if sekarang!=minute :
+        # sekarang = datetime.datetime.now().minute
+        # print(iterate)
+        if len(lines)+1 < iterate :
             iterate = 0
-            minute = sekarang
+            # minute = sekarang
 
         if len(lines) < 1 or iterate>=len(lines):
             iterate = iterate
             f.close()
             continue
-        elif "tmicrosoft" in lines[iterate] or lines[iterate][0:2]!="b\'" :
+        elif "tmicrosoft" in lines[iterate] :
             iterate +=1
             f.close()
             continue
-        else :
+        elif lines[iterate][0:2]!="b\'" or lines[iterate][0:2]!="b\"" :
             raw_data = eval(lines[iterate])
             f.close()
             iterate+=1

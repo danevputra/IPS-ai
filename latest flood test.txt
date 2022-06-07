@@ -1,5 +1,5 @@
 268
 
-707 +- 235 (87,6%)
+1050 +- 262 (97,7%) maybe 100%, need further examination
 
-drop : 33 (12,3%)
+drop : 6 (12,3%)
