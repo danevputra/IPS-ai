@@ -15,6 +15,7 @@ import re
 import csv
 import schedule
 import numpy as np
+import config
 
 mymodel = load_model('my_model_cnn.h5')
 myvectorizer = pickle.load(open("vectorizer_cnn", 'rb'))
@@ -38,12 +39,12 @@ vuln_header = ["User-Agent: ", "X-Api-Version: ", "X-Forwarded-For: ", "Client-I
 
 def main():
 
-    # load_balancer = input("Load Balancer/Reverse Proxy IP Address (if you don't have just fill it with server IP): ")
-    # host_ip = list(map(str, input("Website Server IP Address (separate by spaces) : ").split()))
-    # listen_port = list(map(int, input("Website Server Port to Monitor (separate by spaces) : ").split()))
-    load_balancer = '192.168.56.133'
-    host_ip = ['192.168.56.133']
-    listen_port = [80]
+    if (len(config.load_balancer)<1 or len(config.host_ip)<1 or len(config.listen_port)<1):
+        print("Please do a proper configuration\n")
+        exit()
+    load_balancer = config.load_balancer
+    host_ip = config.host_ip
+    listen_port = config.listen_port
     global iterate
     iterate = 0
     global minute
