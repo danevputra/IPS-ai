@@ -348,6 +348,7 @@ def clean_data(input_val):
     input_val=input_val.replace('{%', ' { % ')
     input_val=input_val.replace('{$', ' { $ ')
     input_val=input_val.replace('}', ' } ')
+    input_val=input_val.replace('.', ' . ')
     input_val=input_val.replace('1 ', 'numeric')
     input_val=input_val.replace(' 1', 'numeric')
     input_val=input_val.replace("'1 ", "'numeric ")
