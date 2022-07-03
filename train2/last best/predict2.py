@@ -91,9 +91,10 @@ def predict_sqli_attack():
 
 
     padding_type='post'
+    trunc_type='post'
     max_length = 50
     sample_sequences = tokenizer.texts_to_sequences(input_val)
-    input_padded = pad_sequences(sample_sequences, padding=padding_type, maxlen=max_length) 
+    input_padded = pad_sequences(sample_sequences, padding=padding_type, truncating=trunc_type, maxlen=max_length) 
 
     result=mymodel.predict(input_padded)
 
