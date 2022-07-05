@@ -127,15 +127,16 @@ def main():
                                         parsing_data = parsing_data.split("=", 1)[1]
                                         # print("bisa kok" + parsing_data)
 
-                                        status_oneline, score_online = predict_sqli_attack(parsing_data)
+                                        status_oneline = predict_sqli_attack(parsing_data)
+                                        #print("status_oneline" + str(type(status_oneline)))
                                         #print(str(status_oneline))
                                         time2_1 = str(datetime.datetime.now())
 
-                                        if float(status_oneline) > 0:
-                                            print_alert(time, time2_1, dest_mac,src_mac,eth_proto,score_online,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
-                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(score_online))
+                                        if float(status_oneline) > 0.5:
+                                            print_alert(time, time2_1, dest_mac,src_mac,eth_proto,status_oneline,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
+                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(status_oneline))
                                         else :
-                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(score_online))
+                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(status_oneline))
 
                                 else:
                                     # print(str(data))
@@ -157,15 +158,16 @@ def main():
                                                 parse_data2 = cut_string(arr2[j])
                                                 if (len(parse_data2)!=0):
                                                     parse_data2 = parse_data2.split("=", 1)[1]
-                                                    status2, score2 = predict_sqli_attack(parse_data2)
-                                                    #print(str(status))
+                                                    status2 = predict_sqli_attack(parse_data2)
+                                                    #print("status2" + str(type(status2)))
+                                                    #print(str(status2))
                                                     time2_2 = str(datetime.datetime.now())
 
-                                                    if float(status2) > 0:
-                                                        print_alert(time, time2_2, dest_mac,src_mac,eth_proto,score2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
-                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(score2))
+                                                    if float(status2) > 0.5:
+                                                        print_alert(time, time2_2, dest_mac,src_mac,eth_proto,status2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
+                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(status2))
                                                     else :
-                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(score2))
+                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(status2))
 
                                     #footer
                                     parse_data = data.rpartition('\n')[2]
@@ -177,15 +179,16 @@ def main():
 
                                         if (len(parse_data)!=0):
                                             parse_data = parse_data.split("=", 1)[1]
-                                            status, score = predict_sqli_attack(parse_data)
+                                            status = predict_sqli_attack(parse_data)
+                                            #print("status" + str(type(status)))
                                             #print(str(status))
                                             time2_3 = str(datetime.datetime.now())
 
-                                            if status > 0:
-                                                print_alert(time, time2_3, dest_mac,src_mac,eth_proto,score,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
-                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",score)
+                                            if float(status) > 0.5:
+                                                print_alert(time, time2_3, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
+                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",status)
                                             else :
-                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",score)
+                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",status)
                                     
                                     #other header
                                     parse_data3 = data
@@ -199,15 +202,17 @@ def main():
                                         check_data = re.search(check_header[x]+'(.*)\r\n', parse_data3).group(1)
                                         # print("check_data : " +  check_data)
                                         if (len(check_data)!=0):
-                                            status3, score3 = predict_sqli_attack(check_data)
+                                            status3 = predict_sqli_attack(check_data)
+                                            #print("status 3 " + str(type(status3)))
+                                            #print(status3)
                                             #print(str(status))
                                             time2_4 = str(datetime.datetime.now())
 
-                                            if float(status3) > 0:
-                                                print_alert(time, time2_4, dest_mac,src_mac,eth_proto,score3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
-                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(score3))
+                                            if float(status3) > 0.5:
+                                                print_alert(time, time2_4, dest_mac,src_mac,eth_proto,status3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
+                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(status3))
                                             else :
-                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(score3))
+                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(status3))
 
 def create_csv():
     global filename
@@ -379,16 +384,12 @@ def predict_sqli_attack(data):
 
     input_val=data
     if input_val=="submit" or input_val=="Submit" :
-        return 0,0
+        return 0
     input_val=clean_data(input_val)
     input_val=[input_val]
     input_val=myvectorizer.transform(input_val).toarray()
     input_val.shape=(1,64,64,1)
     result=mymodel.predict(input_val)
-
-    score = result.tolist()
-    fin_score = score[0][1]
-
-    return np.argmax(result), fin_score
+    return str(result[0][0])
 
 main()
