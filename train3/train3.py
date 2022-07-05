@@ -20,6 +20,7 @@ import keras
 import os
 import math
 import numpy as np
+from keras_visualizer import visualizer 
 
 # preprocess sql data to have same format for all files
 
@@ -422,12 +423,12 @@ model=tf.keras.models.Sequential([
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
-tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
+model.compile(loss='binary_crossentropy', 
+              optimizer='adam', 
+              metrics=['accuracy'])
+print(model.summary())
 
-# model.compile(loss='binary_crossentropy', 
-#               optimizer='adam', 
-#               metrics=['accuracy'])
-# print(model.summary())
+visualizer(model, format='png', view=True)
 
 # # learning_rate = 0.0001
 # # model.compile(loss='binary_crossentropy',
