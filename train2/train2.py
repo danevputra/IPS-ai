@@ -39,15 +39,15 @@ testing_labels = labels[training_size:]
 y_train = np.array(training_labels)
 y_test = np.array(testing_labels)
 
-print(X_train[10])
+# print(X_train[10])
 
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-vocab_size = 500
+vocab_size = 4096
 embedding_dim = 16
-max_length = 50
+max_length = 40
 trunc_type = 'post'
 padding_type = 'post'
 oov_tok = '<OOV>'
@@ -66,7 +66,7 @@ reverse_word_index = dict([(value,key) for (key, value) in word_index.items()])
 def decode_review(text):
   return " ".join([reverse_word_index.get(i,'?') for i in text])
 
-print(decode_review(padded[1]))
+print(padded[1])
 print(X_train[1])
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode='auto', baseline=None, restore_best_weights=True)
@@ -74,14 +74,14 @@ callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
     tf.keras.layers.Conv1D(32, 5, padding='same', activation='relu'),
-    tf.keras.layers.MaxPooling1D(),
+    tf.keras.layers.MaxPooling1D(pool_size=2),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Conv1D(16, 5, padding='same', activation='relu'),
-    tf.keras.layers.MaxPooling1D(),
+    tf.keras.layers.MaxPooling1D(pool_size=2),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(8)),
     tf.keras.layers.Dense(8, activation='relu'),
-    # tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dropout(0.2),
     # tf.keras.layers.LeakyReLU(),
     # tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dense(4, activation='relu'),

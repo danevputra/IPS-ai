@@ -44,7 +44,7 @@ def clean_sqli_data(data):
         data[i]=data[i].replace('{%', ' { % ')
         data[i]=data[i].replace('{$', ' { $ ')
         data[i]=data[i].replace('}', ' } ')
-        data[i]=data[i].replace('.', ' . ')
+        # data[i]=data[i].replace('.', ' . ')
     
     return data
 
@@ -257,7 +257,7 @@ for i in range(len(data)):
 
 # read self created benign data
 
-path='dataset/benign_for_training.txt'
+path='dataset/new.txt'
 benign_data=[]
 f = open(path, "r", encoding="utf8")
 for x in f:

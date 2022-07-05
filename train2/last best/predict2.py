@@ -4,8 +4,8 @@ import pickle
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-mymodel = load_model('my_model_cnn.h5')
-with open('tokenizer.pickle', 'rb') as handle:
+mymodel = load_model('../my_model_cnn.h5')
+with open('../tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
 
 def clean_data(input_val):
@@ -41,7 +41,6 @@ def clean_data(input_val):
     input_val=input_val.replace('{%', ' { % ')
     input_val=input_val.replace('{$', ' { $ ')
     input_val=input_val.replace('}', ' } ')
-    input_val=input_val.replace('.', ' . ')
     input_val=input_val.replace('1 ', 'numeric')
     input_val=input_val.replace(' 1', 'numeric')
     input_val=input_val.replace("'1 ", "'numeric ")
@@ -92,7 +91,7 @@ def predict_sqli_attack():
 
     padding_type='post'
     trunc_type='post'
-    max_length = 50
+    max_length = 40
     sample_sequences = tokenizer.texts_to_sequences(input_val)
     input_padded = pad_sequences(sample_sequences, padding=padding_type, truncating=trunc_type, maxlen=max_length) 
 
@@ -103,7 +102,7 @@ def predict_sqli_attack():
     
     
     if repeat == True:
-        
+        print(input_padded)
         if result>0.5:
             print("ALERT :::: an attack has occurred, detector confidence : " + str(result))
 
