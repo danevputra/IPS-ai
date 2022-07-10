@@ -47,9 +47,8 @@ def main():
     listen_port = config.listen_port
     global iterate
     iterate = 0
-    # global minute
-    # minute = datetime.datetime.now().minute
-    # print(listen_port)
+    global ori_ip
+    ori_ip = load_balancer
     
     print("ready")
     create_csv()
@@ -90,26 +89,37 @@ def main():
             if eth_proto == 8 :
                 (version, header_length, ttl, proto, src, target, data) = ipv4_packet(data)
                 temp = 0
+                # print("source : " + str(src) + "\n")
+
                 #TCP
                 if ((target in host_ip) or (target == load_balancer)) and (proto == 6) :
                     (src_port, dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data_original) = tcp_segment(data)
+
+                    # print("sequence : " + str(sequence) + "\n")
         
                     if (str(data_original).find(substring)== -1) :
 
                         data = str(data_original.decode('utf-8', 'ignore'))
+
+                        cut_ori = "X-Forwarded-For: "
+                        if (load_balancer!=host_ip) and (cut_ori in data) :
+                            ori_ip = re.search(cut_ori+'(.*)\r\n', data).group(1)     
+                        #print(ori_ip)
                         # print("data : "+data)
                         #syn flood
                         if target == load_balancer and flag_syn == 1 and flag_ack == 0 and (len(data)!=0):
                             time_syn = str(datetime.datetime.now())
-                            print_alert(time, time_syn, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Syn Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
-                            append_log(time, time_syn, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Syn Flood DOS")
+                            print_alert(time, time_syn, src, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Syn Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
+                            append_log(time, time_syn, src, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Syn Flood DOS")
+                            block_ip(src)
                         
                         #ack flood
                         #udah bisa kl loic, golden eye belom
                         elif target == load_balancer and flag_syn == 0 and flag_ack == 1 and flag_psh == 0 and (len(data)!=0):
                             time_ack = str(datetime.datetime.now())
-                            print_alert(time, time_ack, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Ack Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
-                            append_log(time, time_ack, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Ack Flood DOS")
+                            print_alert(time, time_ack, src, dest_mac,src_mac,eth_proto,"DOS",version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,"Ack Flood DOS - if this alert keep popping maybe a DOS attack has launched",data)
+                            append_log(time, time_ack, src, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),"DOS","DOS","Ack Flood DOS")
+                            block_ip(src)
                         
                         else :
                             if (dest_port in listen_port) :
@@ -133,10 +143,11 @@ def main():
                                         time2_1 = str(datetime.datetime.now())
 
                                         if float(status_oneline) > 0.5:
-                                            print_alert(time, time2_1, dest_mac,src_mac,eth_proto,status_oneline,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
-                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(status_oneline))
+                                            print_alert(time, time2_1, ori_ip, dest_mac,src_mac,eth_proto,status_oneline,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parsing_data,data)
+                                            append_log(time, time2_1, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"1",float(status_oneline))
+                                            block_ip(ori_ip)
                                         else :
-                                            append_log(time, time2_1, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(status_oneline))
+                                            append_log(time, time2_1, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parsing_data,"0",float(status_oneline))
 
                                 else:
                                     # print(str(data))
@@ -164,10 +175,11 @@ def main():
                                                     time2_2 = str(datetime.datetime.now())
 
                                                     if float(status2) > 0.5:
-                                                        print_alert(time, time2_2, dest_mac,src_mac,eth_proto,status2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
-                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(status2))
+                                                        print_alert(time, time2_2, ori_ip, dest_mac,src_mac,eth_proto,status2,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data2,data)
+                                                        append_log(time, time2_2, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"1",float(status2))
+                                                        block_ip(ori_ip)
                                                     else :
-                                                        append_log(time, time2_2, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(status2))
+                                                        append_log(time, time2_2, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data2,"0",float(status2))
 
                                     #footer
                                     parse_data = data.rpartition('\n')[2]
@@ -185,10 +197,11 @@ def main():
                                             time2_3 = str(datetime.datetime.now())
 
                                             if float(status) > 0.5:
-                                                print_alert(time, time2_3, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
-                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",status)
+                                                print_alert(time, time2_3, ori_ip, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data)
+                                                append_log(time, time2_3, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"1",status)
+                                                block_ip(ori_ip)
                                             else :
-                                                append_log(time, time2_3, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",status)
+                                                append_log(time, time2_3, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),parse_data,"0",status)
                                     
                                     #other header
                                     parse_data3 = data
@@ -209,26 +222,27 @@ def main():
                                             time2_4 = str(datetime.datetime.now())
 
                                             if float(status3) > 0.5:
-                                                print_alert(time, time2_4, dest_mac,src_mac,eth_proto,status3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
-                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(status3))
+                                                print_alert(time, time2_4, ori_ip, dest_mac,src_mac,eth_proto,status3,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,check_data,data)
+                                                append_log(time, time2_4, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"1",float(status3))
+                                                block_ip(ori_ip)
                                             else :
-                                                append_log(time, time2_4, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(status3))
+                                                append_log(time, time2_4, ori_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,str(data_original),check_data,"0",float(status3))
 
 def create_csv():
     global filename
     filename = "log/log_"+str(datetime.datetime.now())+".csv"
     with open(filename, 'w') as f:
         spamwriter = csv.writer(f, doublequote=True, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgment', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'unique data', 'status' , 'Detection Score']
+        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgment', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'real ip', 'unique data', 'status' , 'Detection Score']
         spamwriter.writerow(header)
     f.close()
 
 
-def append_log(time, time2, src_mac, dest_mac, eth_proto, version, header_length, ttl, protocol, src_ip, dest_ip, src_port, dest_port, sequence, acknowledgement, urg, ack, psh, rst, syn, fin, data, parse_data, status , confidence):
+def append_log(time, time2, real_ip, src_mac, dest_mac, eth_proto, version, header_length, ttl, protocol, src_ip, dest_ip, src_port, dest_port, sequence, acknowledgement, urg, ack, psh, rst, syn, fin, data, parse_data, status , confidence):
     # print(filename)
     with open(filename,'a') as fd:
         write_outfile = csv.writer(fd, lineterminator="\n")
-        write_outfile.writerow([str(time), str(time2), str(src_mac), str(dest_mac), str(eth_proto), str(version), str(header_length), str(ttl), str(protocol), str(src_ip), str(dest_ip), str(src_port), str(dest_port), str(sequence), str(acknowledgement), str(urg), str(ack), str(psh), str(rst), str(syn), str(fin), str(data), str(parse_data), str(status) , str(confidence)])
+        write_outfile.writerow([str(time), str(time2), str(src_mac), str(dest_mac), str(eth_proto), str(version), str(header_length), str(ttl), str(protocol), str(src_ip), str(dest_ip), str(src_port), str(dest_port), str(sequence), str(acknowledgement), str(urg), str(ack), str(psh), str(rst), str(syn), str(fin), str(data), str(real_ip), str(parse_data), str(status) , str(confidence)])
     fd.close()
 
 
@@ -259,7 +273,7 @@ def cut_input(string):
     return arr
 
 #print alert
-def print_alert(time, time2, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data):
+def print_alert(time, time2, real_ip, dest_mac,src_mac,eth_proto,status,version,header_length,ttl,proto,src,target,src_port,dest_port,sequence,acknowledgement,flag_urg,flag_ack,flag_psh,flag_rst,flag_syn,flag_fin,parse_data,data):
     print('=======================================')
     print('ALERT ATTACK HAS OCURRED')
     print('=======================================')
@@ -281,6 +295,8 @@ def print_alert(time, time2, dest_mac,src_mac,eth_proto,status,version,header_le
     print(TAB_2 + 'URG : {}, ACK : {}, PSH : {}, RST : {}, SYN : {}, FIN : {}'.format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
     print(TAB_1 + 'Dangerous Payload : ')
     print(DATA_TAB_2 + parse_data)
+    print(TAB_1 + 'Real IP : ')
+    print(DATA_TAB_2 + real_ip)
     print(TAB_1 + 'All Data : \n')
     print(DATA_TAB_2 + re.sub(r'\r\n', '\n\t\t ',data))
     print('\n============END ATTACK INFO============\n\n')
@@ -391,5 +407,16 @@ def predict_sqli_attack(data):
     input_val.shape=(1,64,64,1)
     result=mymodel.predict(input_val)
     return str(result[0][0])
+
+def block_ip(ip_address):
+    data_ip = open('ipdata', 'r')
+    lines = data_ip.readlines()
+    data_ip.close()
+
+    if ip_address not in lines:
+        file_object = open('ipdata', 'a')
+        file_object.write(ip_address + "\n")
+        file_object.close()
+        os.system("iptables -A INPUT -s "+ ip_address +" -j DROP")
 
 main()

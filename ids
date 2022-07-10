@@ -7,9 +7,11 @@ if [[ $EUID -ne 0 ]]; then
 fi
     function print_usage {
         echo "Program usage:" >&2
+        echo "[-b] : show blocked ip" >&2
         echo "[-c] : Configure the IP and Ports" >&2
         echo "[-r] : Run the IDS" >&2
         echo "[-e] : Kill all running IDS processes" >&2
+        echo "[-u] : Unblock IP" >&2
         echo "[-h] : Help Menu" >&2
         exit 1
     }
@@ -17,8 +19,11 @@ fi
     then
         print_usage
     fi
-        while getopts 'creh' OPTION; do
+        while getopts 'bcrehu' OPTION; do
         case "$OPTION" in
+            b)
+                sudo cat ipdata
+                ;;
             c)
                 sudo python3 input_config.py
                 ;;
@@ -32,6 +37,9 @@ fi
                 ;;
             h)
                 print_usage
+                ;;
+            u)
+                sudo python3 unblock.py $2
                 ;;
             ?)
                 print_usage
