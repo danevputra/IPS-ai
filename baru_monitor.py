@@ -418,5 +418,6 @@ def block_ip(ip_address):
         file_object.write(ip_address + "\n")
         file_object.close()
         os.system("iptables -A INPUT -s "+ ip_address +" -j DROP")
+        os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 
 main()

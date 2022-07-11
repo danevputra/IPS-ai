@@ -16,6 +16,7 @@ if ip not in lines :
     exit()
 else :
     os.system("sudo iptables -D INPUT -s "+ ip +" -j DROP")
+    os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
     
     file_object = open('ipdata', 'w')
         
