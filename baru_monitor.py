@@ -233,7 +233,7 @@ def create_csv():
     filename = "log/log_"+str(datetime.datetime.now())+".csv"
     with open(filename, 'w') as f:
         spamwriter = csv.writer(f, doublequote=True, quoting=csv.QUOTE_ALL, lineterminator="\n")
-        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgment', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'real ip', 'unique data', 'status' , 'Detection Score']
+        header = ['Time', 'Detection Finished', 'Source Mac', 'Destination Mac', 'Eth Protocol', 'IPV4 Version', 'Header Length', 'TTL', 'Packet Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Sequence', 'Acknowledgment', 'urg', 'ack', 'psh', 'rst', 'syn', 'fin', 'all data', 'real user ip', 'unique data', 'status' , 'Detection Score']
         spamwriter.writerow(header)
     f.close()
 
