@@ -410,7 +410,7 @@ def predict_sqli_attack(data):
 
 def block_ip(ip_address):
     data_ip = open('ipdata', 'r')
-    lines = data_ip.readlines()
+    lines = data_ip.read().splitlines()
     data_ip.close()
 
     if ip_address not in lines:
