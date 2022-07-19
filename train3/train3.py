@@ -428,89 +428,89 @@ model.compile(loss='binary_crossentropy',
               metrics=['accuracy'])
 print(model.summary())
 
-visualizer(model, format='png', view=True)
+# visualizer(model, format='png', view=True)
 
-# # learning_rate = 0.0001
-# # model.compile(loss='binary_crossentropy',
-# #                   optimizer=tf.keras.optimizers.Adam(learning_rate), 
-# #                   metrics=['accuracy'])
-# # print(model.summary())
+# learning_rate = 0.0001
+# model.compile(loss='binary_crossentropy',
+#                   optimizer=tf.keras.optimizers.Adam(learning_rate), 
+#                   metrics=['accuracy'])
+# print(model.summary())
 
-# BATCH_SIZE = 32
-# num_x_train = len(X_train)
-# print("num train" + str(num_x_train))
+BATCH_SIZE = 32
+num_x_train = len(X_train)
+print("num train" + str(num_x_train))
 
-# classifier_nn = model.fit(X_train,y_train,
-#                     epochs=500,
-#                     verbose=True,
-#                     validation_data=(X_test, y_test),
-#                     steps_per_epoch=math.ceil(num_x_train/BATCH_SIZE),
-#                     callbacks=[callback]
-#                     )
+classifier_nn = model.fit(X_train,y_train,
+                    epochs=500,
+                    verbose=True,
+                    validation_data=(X_test, y_test),
+                    steps_per_epoch=math.ceil(num_x_train/BATCH_SIZE),
+                    callbacks=[callback]
+                    )
 
-# import matplotlib.pyplot as plt
-# plt.plot(classifier_nn.history['loss'])
-# plt.plot(classifier_nn.history['val_loss'])
-# plt.title('model loss')
-# plt.ylabel('loss')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'val'], loc='upper left')
-# plt.show()
+import matplotlib.pyplot as plt
+plt.plot(classifier_nn.history['loss'])
+plt.plot(classifier_nn.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
 
-# plt.plot(classifier_nn.history['accuracy'])
-# plt.plot(classifier_nn.history['val_accuracy'])
-# plt.title('model accuracy')
-# plt.ylabel('accuracy')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'val'], loc='upper left')
-# plt.show()
+plt.plot(classifier_nn.history['accuracy'])
+plt.plot(classifier_nn.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
 
-# pred=model.predict(X_test)
+pred=model.predict(X_test)
 
-# for i in range(len(pred)):
-#     if pred[i]>0.5:
-#         pred[i]=1
-#     elif pred[i]<=0.5:
-#         pred[i]=0
+for i in range(len(pred)):
+    if pred[i]>0.5:
+        pred[i]=1
+    elif pred[i]<=0.5:
+        pred[i]=0
 
-# #accuracy
-# from sklearn.metrics import accuracy_score
-# print("\naccuracy : ")
-# print(accuracy_score(y_test,pred))
-# print("\n")
+#accuracy
+from sklearn.metrics import accuracy_score
+print("\naccuracy : ")
+print(accuracy_score(y_test,pred))
+print("\n")
 
-# #confusion matrix
-# from sklearn.metrics import confusion_matrix
-# print("conf matrix : ")
-# print(confusion_matrix(y_test,pred))
-# print("\n")
+#confusion matrix
+from sklearn.metrics import confusion_matrix
+print("conf matrix : ")
+print(confusion_matrix(y_test,pred))
+print("\n")
 
-# # Recall
-# from sklearn.metrics import recall_score
-# print("recall : ")
-# print(recall_score(y_test,pred, average=None))
-# print("\n")
+# Recall
+from sklearn.metrics import recall_score
+print("recall : ")
+print(recall_score(y_test,pred, average=None))
+print("\n")
 
-# # Precision
-# from sklearn.metrics import precision_score
-# print("precision : ")
-# print(precision_score(y_test,pred, average=None))
-# print("\n")
+# Precision
+from sklearn.metrics import precision_score
+print("precision : ")
+print(precision_score(y_test,pred, average=None))
+print("\n")
 
-# #f1 score
-# from sklearn.metrics import f1_score
-# print("f1 score : ")
-# print(f1_score(y_test,pred, average=None))
-# print("\n")
+#f1 score
+from sklearn.metrics import f1_score
+print("f1 score : ")
+print(f1_score(y_test,pred, average=None))
+print("\n")
 
-# for i,j in zip(y_test,pred):
-#     # print(i==j)
-#     if i==j :
-#         temp = 0
+for i,j in zip(y_test,pred):
+    # print(i==j)
+    if i==j :
+        temp = 0
 
-# from keras.models import load_model
-# import pickle
+from keras.models import load_model
+import pickle
 
-# model.save('my_model_cnn.h5')
-# with open('vectorizer_cnn', 'wb') as fin:
-#     pickle.dump(vectorizer, fin)
+model.save('my_model_cnn.h5')
+with open('vectorizer_cnn', 'wb') as fin:
+    pickle.dump(vectorizer, fin)

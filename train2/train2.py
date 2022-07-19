@@ -22,7 +22,7 @@ import math
 import numpy as np
 import pickle
 
-df=pd.read_csv('../sqli.csv',encoding='utf-16')
+df=pd.read_csv('sqli.csv',encoding='utf-16')
 
 df = df.sample(frac=1).reset_index(drop=True)
 
@@ -79,6 +79,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Conv1D(16, 5, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling1D(pool_size=2),
     tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.LSTM(10, return_sequences=True),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(8)),
     tf.keras.layers.Dense(8, activation='relu'),
     tf.keras.layers.Dropout(0.2),
