@@ -1,11 +1,14 @@
 import csv
+import sys
+
+csv.field_size_limit(sys.maxsize)
 
 threshold = 1
 below = 0
 equal = 0
-file_name = "sqli.csv"
+file_name = "sqli4.csv"
 
-with open(file_name, newline="\n",encoding='utf-16') as csvfile:
+with open(file_name, newline="\n",encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         val = int(row.get("Label", 0))
