@@ -22,7 +22,7 @@ import math
 import numpy as np
 import pickle
 
-df=pd.read_csv('sqli.csv',encoding='utf-16')
+df=pd.read_csv('sqli4.csv',encoding='utf-8')
 
 df = df.sample(frac=1).reset_index(drop=True)
 
@@ -46,7 +46,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 vocab_size = 4096
-embedding_dim = 16
+embedding_dim = 30
 max_length = 40
 trunc_type = 'post'
 padding_type = 'post'
@@ -73,10 +73,10 @@ callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode
 
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
-    tf.keras.layers.Conv1D(32, 5, padding='same', activation='relu'),
+    tf.keras.layers.Conv1D(32, 4, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling1D(pool_size=2),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv1D(16, 5, padding='same', activation='relu'),
+    tf.keras.layers.Conv1D(16, 4, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling1D(pool_size=2),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.LSTM(10, return_sequences=True),
