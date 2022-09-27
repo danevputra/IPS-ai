@@ -73,19 +73,19 @@ callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode
 
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
-    tf.keras.layers.Conv1D(32, 4, padding='same', activation='relu'),
-    tf.keras.layers.MaxPooling1D(pool_size=2),
+    tf.keras.layers.Conv1D(28, 4, padding='same', activation='relu'),
+    tf.keras.layers.MaxPooling1D(pool_size=4),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv1D(16, 4, padding='same', activation='relu'),
-    tf.keras.layers.MaxPooling1D(pool_size=2),
+    tf.keras.layers.Conv1D(7, 4, padding='same', activation='relu'),
+    tf.keras.layers.MaxPooling1D(pool_size=4),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.LSTM(10, return_sequences=True),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(8)),
-    tf.keras.layers.Dense(8, activation='relu'),
-    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.GlobalMaxPooling1D(),
+    # tf.keras.layers.Dense(8, activation='relu'),
+    # tf.keras.layers.Dropout(0.2),
     # tf.keras.layers.LeakyReLU(),
     # tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Dense(4, activation='relu'),
+    # tf.keras.layers.Dense(2, activation='relu'),
+    # tf.keras.layers.LeakyReLU(), 
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
