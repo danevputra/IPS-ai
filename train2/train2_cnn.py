@@ -26,7 +26,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-df=pd.read_csv('sqli4.csv',encoding='utf-8')
+df=pd.read_csv('sqli6.csv',encoding='utf-8')
 
 df = df.sample(frac=1, random_state=12).reset_index(drop=True)
 
@@ -76,15 +76,15 @@ model = tf.keras.Sequential([
     tf.keras.layers.Conv1D(28, 4, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling1D(pool_size=4),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Conv1D(7, 4, padding='same', activation='relu'),
+    tf.keras.layers.Conv1D(14, 4, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling1D(pool_size=4),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.GlobalMaxPooling1D(),
+    tf.keras.layers.GlobalAveragePooling1D(),
     # tf.keras.layers.Dense(8, activation='relu'),
     # tf.keras.layers.Dropout(0.2),
     # tf.keras.layers.LeakyReLU(),
     # tf.keras.layers.BatchNormalization(),
-    # tf.keras.layers.Dense(2, activation='relu'),
+    # tf.keras.layers.Dense(4, activation='relu'),
     # tf.keras.layers.LeakyReLU(), 
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
